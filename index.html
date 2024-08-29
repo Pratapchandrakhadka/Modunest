@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Inventory Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div id="login">
+        <h1>Modunest Furniture</h1>
+        <h2>Login</h2>
+        <form id="login-form">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div id="inventory" style="display: none;">
+        <h1>Modunest Furniture Inventory Management</h1>
+        <nav>
+            <button onclick="showTab('stock-in')">Stock In</button>
+            <button onclick="showTab('stock-out')">Stock Out</button>
+            <button onclick="showTab('balance')">Stock Balance</button>
+            <button onclick="showTab('reports')">Reports</button>
+            <button onclick="showTab('history')">Transaction History</button>
+        </nav>
+
+        <!-- Stock In Tab -->
+        <div id="stock-in" class="tab" >
+            <h2>Stock In</h2>
+            <div class="top-actions">
+                <input type="text" id="search" placeholder="Search by name" oninput="fetchInventory()">
+                <input type="file" id="file-input" accept=".xlsx, .xls">
+                <button id="import-button">Import Excel</button>
+                <button onclick="exportCSV()">Export to CSV</button>
+            </div>
+
+            <form id="inventory-form">
+                <input type="text" id="name" placeholder="Item Name" required>
+                <input type="text" id="vendor" placeholder="Vendor Name" required>
+                <input type="text" id="unit" placeholder="Unit of Measurement" required>
+                <input type="number" id="quantity" placeholder="Quantity" required>
+                <input type="number" step="0.01" id="price" placeholder="Unit Price" required>
+                <button type="submit">Add Item</button>
+            </form>
+
+            <table id="inventory-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Vendor</th>
+                        <th>Unit</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th><!-- Remove currency symbol -->
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+
+        <!-- Stock Out Tab -->
+<div id="stock-out" class="tab" style="display: none;">
+    <h2>Stock Out</h2>
+    <form id="stock-out-form">
+        <label for="out-item-name">Item Name:</label>
+        <select id="out-item-name" required>
+            <!-- Options will be populated by JavaScript -->
+        </select><br>
+
+        <label for="out-quantity">Quantity:</label>
+        <input type="number" id="out-quantity" required><br>
+
+        <label for="out-price">Price:</label>
+        <input type="text" id="out-price" readonly><br>
+
+        <label for="out-total">Total Amount:</label>
+        <input type="text" id="out-total" readonly><br>
+
+        <label for="out-date">Date:</label>
+        <input type="date" id="out-date" required><br>
+
+        <label for="out-department">Department:</label>
+        <input type="text" id="out-department" required><br>
+
+        <label for="out-hod">HOD:</label>
+        <input type="text" id="out-hod" required><br>
+
+        <label for="out-request-person">Request Person Name:</label>
+        <input type="text" id="out-request-person" required><br>
+
+        <label for="out-issuer">Issuer Name:</label>
+        <input type="text" id="out-issuer" required><br>
+
+        <label for="out-task">Task:</label>
+        <input type="text" id="out-task" required><br>
+
+        <button type="submit">Submit</button>
+    </form>
+    <h3>Stock Out Records</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Item Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total Amount</th>
+                <th>Date</th>
+                <th>Department</th>
+                <th>HOD</th>
+                <th>Request Person</th>
+                <th>Issuer</th>
+                <th>Task</th>
+            </tr>
+        </thead>
+        <tbody id="stock-out-body">
+            <!-- Stock out records will be populated by JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+
+
+        <!-- Stock Balance Tab -->
+        <div id="balance" class="tab" style="display: none;">
+            <h2>Stock Balance</h2>
+            <table id="balance-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody id="balance-body"></tbody>
+            </table>
+        </div>
+
+        <!-- Reports Tab -->
+<div id="reports" class="tab" style="display: none;">
+    <h2>Reports</h2>
+    
+    <!-- Full Report -->
+    <h3>Full Report</h3>
+    <button id="generate-full-report">Generate Full Report</button>
+    <div id="full-report-content">
+        <!-- Full report will be displayed here -->
+    </div>
+    
+    <!-- Department and Task Filters -->
+    <h3>Filter by Department or Task</h3>
+    <label for="department-filter">Select Department:</label>
+    <select id="department-filter">
+        <option value="">All Departments</option>
+        <!-- Options will be populated by JavaScript -->
+    </select>
+    <label for="task-filter">Select Task:</label>
+    <select id="task-filter">
+        <option value="">All Tasks</option>
+        <!-- Options will be populated by JavaScript -->
+    </select>
+    <button id="generate-department-report">Generate Department Report</button>
+    <button id="generate-task-report">Generate Task Report</button>
+    <div id="department-report-content">
+        <!-- Department report will be displayed here -->
+    </div>
+    <div id="task-report-content">
+        <!-- Task report will be displayed here -->
+    </div>
+</div>
+
+
+
+
+        <!-- Transaction History Tab -->
+        <div id="history" class="tab" style="display: none;">
+            <h2>Transaction History</h2>
+            <table id="history-table">
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Type</th>
+                        <th>Quantity</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
