@@ -2,6 +2,8 @@ const users = {
     'admin': 'admin'  // Example admin user
 };
 
+
+
 const loginForm = document.getElementById('login-form');
 const inventoryForm = document.getElementById('inventory-form');
 const stockOutForm = document.getElementById('stock-out-form');
